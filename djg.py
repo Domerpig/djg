@@ -20,7 +20,8 @@ def generate(schema):
     """
     Generates a JSON object based on the given schema.
 
-    The different types are generated in the following way:
+    Values are generated for all properties having const, enum
+    or any of the following types defined:
     Number
         - minimum     - default 0
         - maximum     - default 100
@@ -32,7 +33,18 @@ def generate(schema):
     """
     res = dict()
     for key, value in schema["properties"].items():
-        obj_type = value["type"]
+        obj_const = value.get("const")
+        obj_enum = value.get("enum")
+        obj_type = value.get("type")
+
+        if obj_const is not None:
+            res[key] = obj_const
+            continue
+
+        if obj_enum is not None:
+            res[key] = random.choice(obj_enum)
+            continue
+
         match obj_type:
             case "number" | "integer":
                 res[key] = _gen_number(
@@ -59,7 +71,7 @@ if __name__ == "__main__":
         description="djg - create random JSON objects based on a given schema."
     )
     parser.add_argument(
-        "-s", "--schema", help="JSON Schema loaction", required=True, metavar="SCHEMA_FILE"
+        "-s", "--schema", help="JSON Schema location", required=True, metavar="SCHEMA_FILE"
     )
     parser.add_argument(
         "-o", "--output", help="JSON output location - default is stdout", metavar="FILE"

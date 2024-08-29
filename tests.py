@@ -38,3 +38,28 @@ class TestStringGeneration(unittest.TestCase):
         length = len(djg._gen_str(pattern=r"[a-z]{15,20}", min_length=5, max_length=10))
         self.assertGreater(length, 10)
 
+
+class TestJsonObject(unittest.TestCase):
+    def setUp(self) -> None:
+        self.schema = {
+            "type": "object",
+            "properties": {
+                "ProductIdentifier": {
+                    "type": "object",
+                    "properties": {
+                        "Name": {"type": "string", "pattern": "[a-zA-Z]{5,10}"},
+                        "Uid": {
+                            "type": "number",
+                            "minimum": 1000,
+                            "maximum": 100000,
+                        },
+                    },
+                },
+                "ProductQuantity": {"type": "number", "minimum": 0, "maximum": 100},
+            },
+        }
+
+    def test_const(self):
+        self.schema["properties"]["ProductIdentifier"]["properties"]["Name"]["const"] = "test"
+        json_obj = djg.generate(self.schema)
+        self.assertEqual(json_obj["ProductIdentifier"]["Name"], "test")
