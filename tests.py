@@ -10,7 +10,7 @@ class TestNumberGeneration(unittest.TestCase):
 
     @patch("djg.random")
     def test_number(self, mock_random):
-        djg.random.randrange._mock_side_effect = self.random.randrange
+        djg.random.randrange._mock_side_effect = self.random.randrange  # type: ignore
         number = djg._gen_number(minimum=0, maximum=10)
         self.assertEqual(number, 7)
 
@@ -21,7 +21,7 @@ class TestNumberGeneration(unittest.TestCase):
 
     @patch("djg.random")
     def test_number_multiple_of(self, mock_random):
-        djg.random.randrange._mock_side_effect = self.random.randrange
+        djg.random.randrange._mock_side_effect = self.random.randrange  # type: ignore
         multiple_of = 17
         number = djg._gen_number(minimum=0, maximum=100, multiple_of=multiple_of)
         self.assertEqual(number, 68)
@@ -60,6 +60,29 @@ class TestJsonObject(unittest.TestCase):
         }
 
     def test_const(self):
-        self.schema["properties"]["ProductIdentifier"]["properties"]["Name"]["const"] = "test"
-        json_obj = djg.generate(self.schema)
-        self.assertEqual(json_obj["ProductIdentifier"]["Name"], "test")
+        self.schema["properties"]["ProductIdentifier"]["properties"]["Name"][
+            "const"
+        ] = "test"
+        json_obj = djg.gen_from_schema(self.schema)
+        self.assertEqual(json_obj["ProductIdentifier"]["Name"], "test")  # type: ignore
+
+
+class TestArray(unittest.TestCase):
+    def test_array_len(self):
+        array = djg._gen_array(items={"type": "number"}, min_items=5, max_items=10)
+        self.assertGreaterEqual(len(array), 5)
+        self.assertLessEqual(len(array), 10)
+
+    def test_prefix_items(self):
+        streets = ["Street", "Avenue", "Boulevard"]
+        directions = ["NW", "NE", "SW", "SE"]
+        prefix_items = [
+                {"type": "number"},
+                {"type": "string"},
+                {"enum": streets},
+                {"enum": directions},
+            ]
+        array = djg._gen_array(prefix_items=prefix_items)
+        self.assertEqual(len(array), 4)
+        self.assertIn(array[2], streets)
+        self.assertIn(array[3], directions)

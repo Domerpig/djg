@@ -27,3 +27,7 @@ dependencies = ["exrex"]
 [tool.ruff]
 line-length = 100
 indent-width = 4
+
+[tool.black]
+line-length = 100
+indent-width = 4

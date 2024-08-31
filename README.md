@@ -35,7 +35,7 @@ schema = {
     },
 }
 
-json_object = generate(schema)
+json_object = gen_from_schema(schema)
 ```
 
 #### CLI
