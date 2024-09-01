@@ -1,8 +1,13 @@
 # DJG
 DJG is a simple library and cli tool generating JSON objects based on a given schema.
 
-*DJG is in very early development.
-Currently only properties of type number and string are supported.*
+*DJG is in very early development.*
+
+Currently supported features:
+ - number
+ - string
+ - array
+ - enum & const for each type
 
 
 ## Installation
@@ -14,7 +19,7 @@ $ pip install djg
 ## Usage
 #### As Python module
 ```python
-from djg import generate
+from djg import gen_from_schema
 import json
 
 schema = {

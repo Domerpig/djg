@@ -50,16 +50,24 @@ def gen_from_schema(schema) -> dict[str, Any] | int | str | list[Any]:
     """
     Generates a JSON object based on the given schema.
 
-    Values are generated for all properties having const, enum
-    or any of the following types defined:
-    Number
+    Values are generated for the following types defined:
+    any
+        If const or enum are set, these values get used
+    number | integer
         - minimum     - default 0
         - maximum     - default 100
-        - multiple_of - default 1
-    String
+        - multipleOf - default 1
+    string
         - pattern    - default [a-zA-Z0-9]
-        - min_length - default 1 (will be ignored if pattern is set)
-        - max_length - default 10 (will be ignored if pattern is set)
+        - minLength - default 1 (will be ignored if pattern is set)
+        - maxLength - default 10 (will be ignored if pattern is set)
+    array
+        - minItems - default 1  (only in combination with items)
+        - maxItems - default 10 (only in combination with items)
+        - items
+        - prefixItems
+    object
+        Values for all defined properties will be generated
     """
     obj_const = schema.get("const")
     obj_enum = schema.get("enum")
@@ -75,7 +83,7 @@ def gen_from_schema(schema) -> dict[str, Any] | int | str | list[Any]:
             return _gen_number(
                 minimum=schema.get("minimum", 0),
                 maximum=schema.get("maximum", 100),
-                multiple_of=schema.get("multiple_of", 1),
+                multiple_of=schema.get("multipleOf", 1),
             )
         case "string":
             return _gen_str(
@@ -93,7 +101,7 @@ def gen_from_schema(schema) -> dict[str, Any] | int | str | list[Any]:
                 prefix_items=schema.get("prefixItems"),
             )
         case _:
-            raise ValueError(f"Given schema is not supported:\n{schema}")
+            raise ValueError(f"Given type is not supported: {schema['type']}")
 
 
 if __name__ == "__main__":
