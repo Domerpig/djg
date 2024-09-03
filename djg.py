@@ -1,14 +1,25 @@
-import json
-import random
 from typing import Any
+import random
 import exrex
 
 
-def _gen_number(minimum: int, maximum: int, multiple_of: int = 1) -> int:
+def _gen_number(
+    minimum: int | float, maximum: int | float, multiple_of: int | float = 1
+) -> int | float:
     if abs(multiple_of) > 1:
         minimum += multiple_of - minimum % multiple_of
 
-    return random.randrange(minimum, maximum + 1, multiple_of)
+    if type(maximum) is int and type(minimum) is int and type(multiple_of) is int:
+        return random.randrange(minimum, maximum + 1, multiple_of)
+
+    else:
+        if abs(multiple_of) > 1:
+            multiplier_max = maximum // minimum
+            multiplier = random.randint(1, int(multiplier_max))
+            return float(minimum) * multiplier
+        else:
+            random_value_str = "{0:.2f}".format(random.uniform(minimum, maximum))
+            return float(random_value_str)
 
 
 def _gen_str(pattern: str | None = None, min_length: int = 0, max_length: int = 10) -> str:
@@ -26,7 +37,6 @@ def _gen_array(
     # TODO implement support for unique items
     max_length = random.randint(min_items, max_items)
     array = list()
-    print(items)
     if prefix_items is not None:
         for item in prefix_items:
             array.append(gen_from_schema(item))
@@ -46,7 +56,7 @@ def _gen_obj(schema: dict[str, Any]) -> dict:
     return json_obj
 
 
-def gen_from_schema(schema) -> dict[str, Any] | int | str | list[Any]:
+def gen_from_schema(schema) -> dict[str, Any] | int | float | str | list[Any]:
     """
     Generates a JSON object based on the given schema.
 
@@ -54,6 +64,7 @@ def gen_from_schema(schema) -> dict[str, Any] | int | str | list[Any]:
     any
         If const or enum are set, these values get used
     number | integer
+        If any of the following values is a float, a float with two decimal points is generated
         - minimum     - default 0
         - maximum     - default 100
         - multipleOf - default 1
@@ -106,6 +117,7 @@ def gen_from_schema(schema) -> dict[str, Any] | int | str | list[Any]:
 
 if __name__ == "__main__":
     import argparse
+    import json
 
     parser = argparse.ArgumentParser(
         description="djg - create random JSON objects based on a given schema."

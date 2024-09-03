@@ -19,6 +19,25 @@ class TestNumberGeneration(unittest.TestCase):
         self.assertGreaterEqual(number, 0)
         self.assertLessEqual(number, 10)
 
+    def test_multiple_of(self):
+        number = djg._gen_number(minimum=10, maximum=100, multiple_of=7)
+        self.assertGreaterEqual(number, 10)
+        self.assertLessEqual(number, 100)
+        self.assertEqual(number % 7, 0)
+
+    def test_number_float(self):
+        number = djg._gen_number(minimum=2, maximum=15.6)
+        self.assertIsInstance(number, float)
+        self.assertGreaterEqual(number, 2)
+        self.assertLessEqual(number, 15.6)
+
+    def test_multiple_of_float(self):
+        number = djg._gen_number(minimum=10, maximum=100, multiple_of=7.5)
+        self.assertIsInstance(number, float)
+        self.assertGreaterEqual(number, 10.0)
+        self.assertLessEqual(number, 100.0)
+        self.assertEqual(number % 7.5, 0)
+
     @patch("djg.random")
     def test_number_multiple_of(self, mock_random):
         djg.random.randrange._mock_side_effect = self.random.randrange  # type: ignore
@@ -60,9 +79,7 @@ class TestJsonObject(unittest.TestCase):
         }
 
     def test_const(self):
-        self.schema["properties"]["ProductIdentifier"]["properties"]["Name"][
-            "const"
-        ] = "test"
+        self.schema["properties"]["ProductIdentifier"]["properties"]["Name"]["const"] = "test"
         json_obj = djg.gen_from_schema(self.schema)
         self.assertEqual(json_obj["ProductIdentifier"]["Name"], "test")  # type: ignore
 
@@ -77,11 +94,11 @@ class TestArray(unittest.TestCase):
         streets = ["Street", "Avenue", "Boulevard"]
         directions = ["NW", "NE", "SW", "SE"]
         prefix_items = [
-                {"type": "number"},
-                {"type": "string"},
-                {"enum": streets},
-                {"enum": directions},
-            ]
+            {"type": "number"},
+            {"type": "string"},
+            {"enum": streets},
+            {"enum": directions},
+        ]
         array = djg._gen_array(prefix_items=prefix_items)
         self.assertEqual(len(array), 4)
         self.assertIn(array[2], streets)
