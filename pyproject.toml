@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "djg"
-version = "0.1.0"
+version = "0.1.1"
 authors = [
     {name="Domink Moos", email="dominik.moos@proton.me"}
 ]
@@ -22,12 +22,11 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
 ]
+dependencies = ["exrex"]
 
 [project.urls]
 Repository = "https://github.com/Domerpig/djg"
 Issues = "https://github.com/Domerpig/djg/issues"
-
-dependencies = ["exrex"]
 
 [tool.ruff]
 line-length = 100
