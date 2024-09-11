@@ -56,7 +56,7 @@ def _gen_obj(schema: dict[str, Any]) -> dict:
     return json_obj
 
 
-def gen_from_schema(schema) -> dict[str, Any] | int | float | str | list[Any]:
+def gen_from_schema(schema) -> dict[str, Any] | int | float | str | list[Any] | None:
     """
     Generates a JSON object based on the given schema.
 
@@ -111,6 +111,8 @@ def gen_from_schema(schema) -> dict[str, Any] | int | float | str | list[Any]:
                 items=schema.get("items", False),
                 prefix_items=schema.get("prefixItems"),
             )
+        case "null":
+            return None
         case _:
             raise ValueError(f"Given type is not supported: {schema['type']}")
 
